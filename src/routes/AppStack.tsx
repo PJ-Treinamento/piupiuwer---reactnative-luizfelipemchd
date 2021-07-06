@@ -5,7 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import Login from "../pages/Login";
 import Timeline from "../pages/Timeline"
 import { AuthProvider } from "../hooks/useAuth";
-import Redirect from "./redirect";
+import Redirect from "./Redirect";
 
 const {Navigator, Screen} = createStackNavigator();
 
@@ -15,8 +15,6 @@ const AppStack = () => {
         <NavigationContainer>
             <Navigator screenOptions={ { headerShown: false } }>
                 <Screen name='Redirect' component={Redirect}/>
-                {/* <Screen name="Login" component={Login} />
-                <Screen name="Timeline" component={Timeline} /> */}
             </Navigator>
         </NavigationContainer>
     );
