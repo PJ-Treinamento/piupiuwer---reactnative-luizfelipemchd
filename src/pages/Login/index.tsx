@@ -1,64 +1,117 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, TextInput } from "react-native";
-import styles from "./styles"
+import { useState } from "react";
+import { Image } from "react-native";
+import useAuth, { IUserData } from "../../hooks/useAuth";
+import { AxiosResponse } from "axios";
+import api from "../../services/api";
 
 import hugeBird from "../../assets/passarinzao.png"
 import showPassword from "../../assets/showPass.png"
 import hidePassword from "../../assets/hidePass.png"
-import { useState } from "react";
+
+import { Bird, Container, EmailInput, EyeIconButton, InnerText, InputsWrapper, PasswordInput, PasswordWrapper, SendButton, SendButtonText, TextWrapper } from "./styles"
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+interface Cred {
+    email: string;
+    password: string;
+}
+
 
 const Login = () =>{
-
+    
     const [passwordVisibility, setPasswordVisibility] = useState(true)
     const [emailInfo, setEmailInfo] = useState("")
     const [passwordInfo, setPasswordInfo] = useState("")
+    const { setUserData } = useAuth()
 
     function handlePasswordVisibility() {
         setPasswordVisibility(!passwordVisibility);
     }
 
-    function doLogin(){
-        console.log("senha", passwordInfo)
-        console.log("email", emailInfo)
-        setPasswordInfo("")
-        setEmailInfo("")
+    // function doLogin(){
+    //     console.log("senha", passwordInfo)
+    //     console.log("email", emailInfo)
+    //     setPasswordInfo("")
+    //     setEmailInfo("")
+    // }
+
+    const login = async ({ email, password }: Cred) => {
+        try{
+            const response: AxiosResponse<IUserData> = await api.post('/sessions/login', {
+                email,
+                password,
+            })
+
+            return response.data;
+        }catch(error){
+            console.log(error);
+            return {} as IUserData;
+        } 
+    };
+
+    const loginRequest = async () => {
+        console.log("-" + emailInfo + "-", "-" + passwordInfo + "-");
+        
+        const {user, token} = await login({ email: emailInfo, password: passwordInfo});
+        
+
+        if(user && token){ 
+            try{
+                setUserData( {user, token} as IUserData)
+            }catch(e){
+                console.log(e);
+                
+            }
+            console.log(user, token);
+            
+            AsyncStorage.setItem("@Piupiuwer:token", token);
+            AsyncStorage.setItem("@Piupiuwer:user", JSON.stringify(user));
+            
+            api.defaults.headers.authorization = `Bearer ${token}`
+        }
+        
     }
 
 
     return (
-        <View style={styles.container}>
-            <Image source={hugeBird} style={styles.bird}></Image>
-            <View style={styles.text}>
-                <Text style={styles.innerText}>Faça pius de qualquer lugar...</Text>
-                <Text style={styles.innerText}>Entre e se divirta!</Text>
-            </View>
+        <Container>
+            
+            <Bird source={hugeBird}></Bird>
 
-            <View style={styles.inputs}>
-                <TextInput
-                    style={styles.emailInput}
+            <TextWrapper>
+                <InnerText>Faça pius de qualquer lugar...</InnerText>
+                <InnerText>Entre e se divirta!</InnerText>
+            </TextWrapper>
+
+            <InputsWrapper>
+
+                <EmailInput
                     placeholder="E-mail"
                     value={emailInfo}
                     onChangeText={text => setEmailInfo(text)}
                 />
-                <View style={styles.passwordWrapper}>
-                    <TextInput
-                        style={styles.passwordInput}
+                <PasswordWrapper>
+
+                    <PasswordInput
                         placeholder="Senha"
                         secureTextEntry={passwordVisibility}
                         value={passwordInfo}
                         onChangeText={text => setPasswordInfo(text)}
                     />
-                    <TouchableOpacity onPress={handlePasswordVisibility} style={styles.eye}>
+
+                    <EyeIconButton onPress={handlePasswordVisibility} >
                         <Image source={passwordVisibility ? showPassword : hidePassword}/>
-                    </TouchableOpacity>
-                </View>
-            </View>
+                    </EyeIconButton>
+                </PasswordWrapper>
 
-            <TouchableOpacity onPress={doLogin} style={styles.button}>
-                <Text style={styles.buttonText}>Entrar</Text>
-            </TouchableOpacity>
+            </InputsWrapper>
 
-        </View>
+            <SendButton onPress={loginRequest} >
+                <SendButtonText>Entrar</SendButtonText>
+            </SendButton>
+
+        </Container>
     );
 }
 
