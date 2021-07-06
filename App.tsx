@@ -1,13 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Login from './src/pages/Login';
+import AppStack from './src/routes/AppStack';
+import { StatusBar } from 'expo-status-bar';
+import { AuthProvider } from './src/hooks/useAuth';
 
 export default function App() {
   return (
-    <View>
-      <Login/>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <AuthProvider>
+        <AppStack />
+        <StatusBar style="auto" />
+      </AuthProvider>
+    </>
   );
 }
