@@ -10,7 +10,7 @@ const TimelineStack = () => {
     return(
         <Navigator screenOptions={ { headerShown: false } }>
             <Screen name='Timeline' component={Timeline}/>
-            <Screen name="SearchPage" component={MakePiuPage} />
+            <Screen name="MakePiuPage" component={MakePiuPage} />
         </Navigator>
     );
 }
