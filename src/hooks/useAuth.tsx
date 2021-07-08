@@ -1,10 +1,9 @@
-import React from "react";
-// import { AxiosResponse } from "axios";
-// import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { createContext, useContext, useState } from "react";
 import  AsyncStorage  from "@react-native-async-storage/async-storage";
 import { User } from "../models";
 import api from "../services/api";
+import { AxiosResponse } from "axios";
 
 export interface IUserData{
     token: string;
@@ -21,7 +20,9 @@ const AuthContext = createContext<IAuthContext>({} as IAuthContext)
 
 export const AuthProvider: React.FC = ({ children }) => {
     
-    const [userData, setUserData ] = useState<IUserData>(() => {
+    const [userData, setUserData ] = useState<IUserData>({} as IUserData)
+
+    useEffect(() => {
         const getUserData = async () => {
             try{
                 const token = await AsyncStorage.getItem('@Piupiuwer:token');
@@ -29,31 +30,31 @@ export const AuthProvider: React.FC = ({ children }) => {
 
                 if (user && token) {
                     api.defaults.headers.authorization = `Bearer ${token}` 
-                    return { token, user: JSON.parse(user) };
+                    setUserData( { token, user: JSON.parse(user) });
                 }
             }catch(e){
                 console.log(e);
-                return {} as IUserData;
+                setUserData( {} as IUserData);
             }
             return {} as IUserData;
         }
 
-        const returnObj: IUserData = getUserData() as unknown as IUserData;
-        return returnObj;
-    })
+        getUserData()
+    }, [])
     
-    // useEffect( () => {
-    //     const updateUser = async () =>{
-    //         const userString = localStorage.getItem('@Piupiuwer:user')
-    //         const user = userString ? JSON.parse(userString) : "";
-    //         if(user && user !== userData.user){
-    //             const response: AxiosResponse<User[]> = await api.get(`/users?username=${user.username}`, {})
-    //             setUserData( { ...userData, user: response.data[0] })
-    //             localStorage.setItem("@Piupiuwer:user", JSON.stringify(user) )
-    //         }
-    //     }
-    //     updateUser()
-    // }, [] )
+    useEffect( () => {
+        const updateUser = async () =>{
+            const userString = await AsyncStorage.getItem('@Piupiuwer:user')
+            const user = userString ? JSON.parse(userString as unknown as string) : "";
+            console.log(user)
+            if(user && user !== userData.user){
+                const response: AxiosResponse<User[]> = await api.get(`/users?username=${user.username}`, {})
+                setUserData( { ...userData, user: response.data[0] })
+                AsyncStorage.setItem("@Piupiuwer:user", JSON.stringify(user) )
+            }
+        }
+        updateUser()
+    }, [] )
 
     return(
         <AuthContext.Provider value={ { ...userData, setUserData }}>
