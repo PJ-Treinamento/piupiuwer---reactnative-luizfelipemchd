@@ -29,13 +29,6 @@ const Login = () =>{
         setPasswordVisibility(!passwordVisibility);
     }
 
-    // function doLogin(){
-    //     console.log("senha", passwordInfo)
-    //     console.log("email", emailInfo)
-    //     setPasswordInfo("")
-    //     setEmailInfo("")
-    // }
-
     const login = async ({ email, password }: Cred) => {
         try{
             const response: AxiosResponse<IUserData> = await api.post('/sessions/login', {
@@ -51,7 +44,6 @@ const Login = () =>{
     };
 
     const loginRequest = async () => {
-        console.log("-" + emailInfo + "-", "-" + passwordInfo + "-");
         
         const {user, token} = await login({ email: emailInfo, password: passwordInfo});
         
@@ -63,10 +55,11 @@ const Login = () =>{
                 console.log(e);
                 
             }
-            console.log(user, token);
             
+            const userString = JSON.stringify(user);
+
             AsyncStorage.setItem("@Piupiuwer:token", token);
-            AsyncStorage.setItem("@Piupiuwer:user", JSON.stringify(user));
+            AsyncStorage.setItem("@Piupiuwer:user", userString);
             
             api.defaults.headers.authorization = `Bearer ${token}`
         }

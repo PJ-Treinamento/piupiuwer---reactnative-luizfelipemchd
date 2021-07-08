@@ -78,7 +78,7 @@ const PiuMade: React.FC<PiuMadeProps> = (props) =>{
             <PiuDisplay>
 
                 <ImgWrapper>
-                    <ProfileImage source={props.img || stdPic} />
+                    <ProfileImage source={props.img ? {uri: props.img} : stdPic} />
                 </ImgWrapper>
                 
                 <BalloonWrapper>
