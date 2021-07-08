@@ -13,6 +13,7 @@ import fav from "../../assets/fav.png"
 import faved from "../../assets/faved.png"
 import deletePiu from "../../assets/delete.png"
 import stdPic from "../../assets/goProfile.png"
+import usePiusList from "../../hooks/usePiusList";
 
 interface PiuMadeProps{
     username: string;
@@ -25,6 +26,7 @@ interface PiuMadeProps{
 }
 
 const PiuMade: React.FC<PiuMadeProps> = (props) =>{
+    const { getPiuList } = usePiusList();
     const [likeNumber, setLikeNumber] = useState<Number>(props.likes.length)
     const { user } = useAuth()
     const [situation, setSituation] = useState< {isLiked:boolean, isFaved: boolean} >( () => {
@@ -63,12 +65,12 @@ const PiuMade: React.FC<PiuMadeProps> = (props) =>{
     } 
 
     const erasePiu = async () => {
-        // try{
-        //     await api.delete("/pius", { data: { piu_id: props.id }})
-        //     props.piuListState.function( props.piuListState.pius.filter( piu => piu.id !== props.id ))
-        // }catch(error){
-        //     console.log(error)
-        // }
+        try{
+            await api.delete("/pius", { data: { piu_id: props.id }})
+            getPiuList()
+        }catch(error){
+            console.log(error)
+        }
     }
 
     return (

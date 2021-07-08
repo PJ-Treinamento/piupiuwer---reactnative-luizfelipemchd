@@ -3,12 +3,15 @@ import { Container, Logo, MakePiuButton, MakePiuImage, MakePiuText } from "./sty
 
 import LogoHeader from "../../assets/logo-header.png"
 import MakePiuIcon from "../../assets/make-piu-icon.png"
+import { useNavigation } from "@react-navigation/native";
 
-const Header = () => {
+
+const Header: React.FC = () => {
+    const { navigate } = useNavigation(); 
     return (
         <Container>
             <Logo source={LogoHeader} />
-            <MakePiuButton>
+            <MakePiuButton onPress={() => navigate('MakePiuPage')}>
                 <MakePiuText>Piue</MakePiuText>
                 <MakePiuImage source={MakePiuIcon}/>
             </MakePiuButton>
